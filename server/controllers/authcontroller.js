@@ -63,7 +63,8 @@ const login = async (req, res) => {
         if(!isPassWordMatch){
             return res.status(401).json({
                 success : false,
-                message  : "Invalid Password"
+                message  : "Invalid Password",
+                
             })
         }
 
@@ -74,7 +75,13 @@ const login = async (req, res) => {
         res.status(200).json({
             success : true,
             message : "User logged in successfully",
-            token : token
+            token : token,
+            user :  {
+                   _id: user._id,
+                   username: user.username,
+                   email: user.email,
+                   avatar: user.avatar,
+                }
         })
 
     }catch(error){
