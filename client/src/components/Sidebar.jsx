@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api/api"
 import {useAuth} from "../context/AuthContext.jsx"
-const Sidebar = () => {
+const Sidebar = ({setSelectedConversation}) => {
   const [conversations, setConversations] = useState([]);
   const {user} = useAuth();
   
@@ -126,7 +126,12 @@ const Sidebar = () => {
           participant._id !== user._id
         );
       return(
-          <div key={conversation._id} className="p-3 rounded-lg bg-zinc-800 mb-2 cursor-pointer">
+          <div key={conversation._id} 
+            onClick={() => {
+              console.log("Clicked:", conversation);
+              setSelectedConversation(conversation)
+            }}
+            className="p-3 rounded-lg bg-zinc-800 mb-2 cursor-pointer">
               <h4 className="text-white font-medium"> {otherParticipant?.username}</h4>
 
                  <p className="text-sm text-zinc-400">{conversation.lastMessage?.text || "No messages yet"}</p>
