@@ -1,10 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
-const ChatWindow = ({selectedConversation }) => {
+const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef(null);
+  const {user} = useAuth();
+
+  const otherParticipant = selectedConversation?.participants?.find((participant) => participant._id !== user._id);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior : "smooth"
+    })
+  },[messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -44,55 +55,117 @@ const ChatWindow = ({selectedConversation }) => {
       }
     );
 
-    console.log(response.data);
-
+   
     setMessages([...messages, response.data]);
     setNewMessage("");
+    setRefreshSidebar(prev => !prev);
 
   } catch (error) {
     console.error(error.message);
   }
 };
   return (
-  <div className="flex-1 p-4 text-white">
+  <div className="flex-1 flex flex-col p-4 text-white">
 
     {!selectedConversation ? (
-      <h2>Select a Conversation</h2>
-    ) : (
-      <>
-        <h2 className="text-xl font-bold mb-4">
-          Messages
-        </h2>
 
-        {messages.map((message) => (
-          <div
-            key={message._id}
-            className="bg-zinc-800 p-3 rounded-lg mb-2"
-          >
-            {message.text}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center">
+
+          <div className="text-6xl mb-4">
+            💬
           </div>
-        ))}
-        <div className="flex mt-4 gap-2">
 
-  <input
-    type="text"
-    value={newMessage}
-    onChange={(e) => setNewMessage(e.target.value)}
-    placeholder="Type a message..."
-    className="flex-1 p-3 rounded-lg bg-zinc-800 text-white"
-  />
+          <h2 className="text-3xl font-bold mb-3">
+            Welcome to DevCollab
+          </h2>
 
-  <button
-    onClick={sendMessages}
-    className="px-4 py-2 bg-blue-600 rounded-lg"
-  >
-    Send
-  </button>
+          <p className="text-zinc-400">
+            Search for developers and start collaborating.
+          </p>
 
-</div>
+        </div>
+      </div>
+
+    ) : (
+
+      <>
+        {/* Header */}
+        <div className="border-b border-zinc-800 pb-4 mb-4">
+          <h2 className="text-xl font-bold">
+            {otherParticipant?.username}
+          </h2>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto">
+          {messages.map((message) => {
+
+            const isMine =
+              message.sender._id === user._id;
+
+            return (
+              <div
+                key={message._id}
+                className={`flex mb-3 ${
+                  isMine
+                    ? "justify-end"
+                    : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-xs px-4 py-2 rounded-lg ${
+                    isMine
+                      ? "bg-blue-600"
+                      : "bg-zinc-800"
+                  }`}
+                >
+                  <p>{message.text}</p>
+
+                  <p className="text-xs text-zinc-300 mt-1 text-right">
+                    {new Date(
+                      message.createdAt
+                    ).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+
+          <div ref={messagesEndRef}></div>
+        </div>
+
+        {/* Input */}
+        <div className="flex gap-2 border-t border-zinc-800 pt-4">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) =>
+              setNewMessage(e.target.value)
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                sendMessages();
+              }
+            }}
+            placeholder="Type a message..."
+            className="flex-1 p-3 rounded-lg bg-zinc-800 text-white"
+          />
+
+          <button
+            onClick={sendMessages}
+            className="px-4 py-2 bg-blue-600 rounded-lg"
+          >
+            Send
+          </button>
+        </div>
       </>
+
     )}
-    
 
   </div>
 );

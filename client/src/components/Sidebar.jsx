@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api/api"
 import {useAuth} from "../context/AuthContext.jsx"
-const Sidebar = ({setSelectedConversation}) => {
+const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
   const [conversations, setConversations] = useState([]);
   const {user} = useAuth();
   
@@ -9,8 +9,7 @@ const Sidebar = ({setSelectedConversation}) => {
   const [searchResults, setSearchResults] = useState([]);
   
   //fetch conversations
-  useEffect(() => {
-    const fetchConversations = async () => {
+   const fetchConversations = async () => {
     try{
       
       const token = localStorage.getItem("token");
@@ -28,8 +27,10 @@ const Sidebar = ({setSelectedConversation}) => {
       
     }
     }
-    fetchConversations();
-  }, [])
+  useEffect(() => {
+   // eslint-disable-next-line react-hooks/set-state-in-effect
+   fetchConversations();
+  }, [refreshSidebar])
 
   //fetch search results
 
