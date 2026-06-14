@@ -1,99 +1,20 @@
-import { useState, useEffect } from "react";
-import api from "../api/api"
+
 import {useAuth} from "../context/AuthContext.jsx"
 import { Link } from "react-router-dom";
+import { useConversations } from "../hooks/useConversations.jsx";
+
 const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
-  const [conversations, setConversations] = useState([]);
-  const {user} = useAuth();
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  
-  //fetch conversations
-   const fetchConversations = async () => {
-    try{
-      
-      const token = localStorage.getItem("token");
-      const response = await api.get("/conversations",{
-        headers : {
-          Authorization : `Bearer ${token}`
-        }
-
-        
-      })
-      setConversations(response.data);
-    
-    }catch(error){
-      console.log(error.message);
-      
-    }
-    }
-  useEffect(() => {
-   // eslint-disable-next-line react-hooks/set-state-in-effect
-   fetchConversations();
-  }, [refreshSidebar])
-
-  //fetch search results
-
-  useEffect(() => {
-    const fetchSearchResult = async() => {
-      try{
-        const token = localStorage.getItem("token");
-        const response = await api.get(`/users/search?q=${searchTerm}`,{
-          headers : {
-            Authorization : `Bearer ${token}`
-          }
-          
-
-        })
-        setSearchResults(response.data);
-      }catch(error){
-        console.log(error.message);
-      }
-      
-    }
-    if (searchTerm.trim()) {
-    fetchSearchResult();
-  } else {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSearchResults([]);
-  }
-  }, [searchTerm])
-
-  // create Conversation
-
- 
-    const createConversation = async(receiverId) => {
-      try{
-        const token = localStorage.getItem("token");
-        const response = await api.post("/conversations",{
-          receiverId
-        },{
-          headers : {
-            Authorization : `Bearer ${token}`,
-          },
-        })
-        console.log(response.data);
-        alert("Conversation Created");
-      }catch(error){
-        console.log(error.message);
-      }
-    } 
-   
+const {user} = useAuth();
+ const {conversations, searchTerm, setSearchTerm, searchResults, handleCreateConversation} = useConversations(refreshSidebar);
    
   return (
     <div className="w-1/4 border-r border-zinc-800 p-4">
-      
       <h2 className="text-xl font-bold text-white mb-4">
         DevCollab
       </h2>
-
-      <Link
-  to="/profile"
-  className="block mb-4 p-2 rounded bg-zinc-800 text-center"
->
-  Edit Profile
-</Link>
+      <Link to="/profile" className="block mb-4 p-2 rounded bg-zinc-800 text-center">
+      Edit Profile
+      </Link>
 
       <input
         type="text"
@@ -105,11 +26,11 @@ const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
         }}
       />
      {
-  searchResults.map((user) => (
+    searchResults.map((user) => (
     <div
       key={user._id}
       className="p-3 mt-2 rounded-lg bg-zinc-700 cursor-pointer hover:bg-zinc-600 transition"
-      onClick={() => createConversation(user._id)}
+      onClick={() => handleCreateConversation(user._id)}
     >
       <h4 className="text-white font-medium">
         {user.username}

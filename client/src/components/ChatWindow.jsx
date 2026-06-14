@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import api from "../api/api";
+import { useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
+
+import { useMessages } from "../hooks/useMessages";
 
 const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
 
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const {messages, newMessage, setNewMessage, handleSendMessage} = useMessages(selectedConversation, setRefreshSidebar);
+  
   const messagesEndRef = useRef(null);
   const {user} = useAuth();
 
@@ -17,53 +18,7 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
     })
   },[messages]);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try{
-        const token = localStorage.getItem("token");
-        const response = await api.get(`/messages/${selectedConversation._id}`,{
-          headers : {
-            Authorization : `Bearer ${token}`,
-          }
-        })
-        setMessages(response.data);
-      }catch(error){
-        console.error(error.message);
-      }
-    }
-    if (selectedConversation) {
-       fetchMessages();
-    }
-  }, [selectedConversation])
 
- const sendMessages = async () => {
-  if (!newMessage.trim()) return;
-  try {
-
-    const token = localStorage.getItem("token");
-
-    const response = await api.post(
-      "/messages/send",
-      {
-        conversationId: selectedConversation._id,
-        text: newMessage,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-   
-    setMessages([...messages, response.data]);
-    setNewMessage("");
-    setRefreshSidebar(prev => !prev);
-
-  } catch (error) {
-    console.error(error.message);
-  }
-};
   return (
   <div className="flex-1 flex flex-col p-4 text-white">
 
@@ -149,7 +104,7 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
             }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                sendMessages();
+                handleSendMessage();
               }
             }}
             placeholder="Type a message..."
@@ -157,7 +112,7 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
           />
 
           <button
-            onClick={sendMessages}
+            onClick={handleSendMessage}
             className="px-4 py-2 bg-blue-600 rounded-lg"
           >
             Send

@@ -1,52 +1,18 @@
-import { useEffect, useState } from "react";
-import api from "../api/api.jsx"
+
+import { useProfile } from "../hooks/useProfile.jsx";
 
 const Profile = () => {
-    const [bio, setBio] = useState("");
-    const [skills, setSkills] = useState("");
-    const [github, setGithub] = useState("");
-    const [avatar, setAvatar] = useState("");
+    const {bio, skills, github, avatar,setBio, setSkills, setGithub, setAvatar,saveProfile} = useProfile();
 
      const handleSave = async() =>{
-            try{
-                const token = localStorage.getItem("token");
-                await api.put("/users/profile", {
-                    bio,
-                    skills : skills.split(",").map(skill => skill.trim()),
-                    github,
-                    avatar
-                },{
-                    headers : {
-                        Authorization : `Bearer ${token}`
-                    }
-                })
-                alert("Profile Updated");
-            }catch(error){
-                console.log(error.message);
-            }
+        const success = saveProfile();
+        if(success){
+            alert("Profile Updated");
+        }
     }
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try{
-                const token = localStorage.getItem("token");
-                const response = await api.get("/users/profie", {
-                    headers : {
-                        Authorization : `Bearer ${token}`
-                    }
-                })
-                setBio(response.data.bio || "");
-                setSkills(response.data.skills?.join(", ") || "");
-                setGithub(response.data.github || "");
-                setAvatar(response.data.avatar || "");
-            }catch(error){
-                console.log(error.message);
-            }
-        }
-        fetchProfile();
-    }, [])
     return (
-  <div className="min-h-screen bg-zinc-950 text-white p-8">
+   <div className="min-h-screen bg-zinc-950 text-white p-8">
 
     <h1 className="text-3xl font-bold mb-8">
       Edit Profile
