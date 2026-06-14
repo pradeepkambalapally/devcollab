@@ -32,7 +32,7 @@ const getConversations = async (req, res) => {
     try{
         const conversations = await Conversation.find({
             participants : req.user._id
-        }).populate('participants', 'username email avatar').populate('lastMessage');
+        }).populate('participants', 'username email avatar bio skills github').populate('lastMessage');
 
         res.status(200).json(conversations);
     }catch(error){

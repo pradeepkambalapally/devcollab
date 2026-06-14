@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api/api"
 import {useAuth} from "../context/AuthContext.jsx"
+import { Link } from "react-router-dom";
 const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
   const [conversations, setConversations] = useState([]);
   const {user} = useAuth();
@@ -86,6 +87,13 @@ const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
       <h2 className="text-xl font-bold text-white mb-4">
         DevCollab
       </h2>
+
+      <Link
+  to="/profile"
+  className="block mb-4 p-2 rounded bg-zinc-800 text-center"
+>
+  Edit Profile
+</Link>
 
       <input
         type="text"

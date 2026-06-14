@@ -6,16 +6,30 @@ const RightPanel = ({selectedConversation}) => {
   selectedConversation?.participants?.find(
     participant => participant._id !== user._id
   );
-  if (!selectedConversation) {
+ if (!selectedConversation) {
   return (
     <div className="w-80 border-l border-zinc-800 p-6">
-      <h2 className="text-xl font-bold">
+
+      <h2 className="text-xl font-bold mb-6">
         Profile
       </h2>
 
-      <div className="mt-6 text-zinc-400">
-        Select a conversation to view profile details.
+      <div className="flex flex-col items-center justify-center h-full text-center">
+
+        <div className="text-5xl mb-4">
+          👤
+        </div>
+
+        <h3 className="text-lg font-semibold mb-2">
+          No Profile Selected
+        </h3>
+
+        <p className="text-zinc-400">
+          Select a conversation to view user details.
+        </p>
+
       </div>
+
     </div>
   );
 }
@@ -61,6 +75,40 @@ const RightPanel = ({selectedConversation}) => {
 
         <p>
           {otherParticipant?.email}
+        </p>
+      </div>
+      <div>
+        <p className="text-zinc-500 text-sm">
+          Bio
+        </p>
+
+        <p>
+          {otherParticipant?.bio || "NA"}
+        </p>
+      </div>
+
+     <div>
+  <p className="text-zinc-500 text-sm">
+    Skills
+  </p>
+  <div className="flex flex-wrap gap-2">
+  {otherParticipant?.skills?.length ? (
+    otherParticipant.skills.map((skill, index) => (
+      <p key={index}>{skill}</p>
+    ))
+  ) : (
+    <p>NA</p>
+  )}
+  </div>
+</div>
+
+      <div>
+        <p className="text-zinc-500 text-sm">
+          github
+        </p>
+
+        <p>
+          {otherParticipant?.github || "NA"}
         </p>
       </div>
 

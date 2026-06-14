@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import {Routes, Route} from "react-router-dom";
-
+import Profile from "./pages/Profile";
 function App(){
 
   return (
@@ -15,6 +15,14 @@ function App(){
           <Dashboard />
         </ProtectedRoutes>
       } />
+      <Route
+  path="/profile"
+  element={
+    <ProtectedRoutes>
+      <Profile />
+    </ProtectedRoutes>
+  }
+/>
     </Routes>
   )
 }
