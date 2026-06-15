@@ -69,12 +69,10 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
                 }`}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-lg ${
-                    isMine
-                      ? "bg-blue-600"
-                      : "bg-zinc-800"
+                className={`max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                  isMine ? "bg-blue-600" : "bg-zinc-800"
                   }`}
-                >
+                  >
                   <p>{message.text}</p>
 
                   <p className="text-xs text-zinc-300 mt-1 text-right">
@@ -95,29 +93,33 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
         </div>
 
         {/* Input */}
-        <div className="flex gap-2 border-t border-zinc-800 pt-4">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) =>
-              setNewMessage(e.target.value)
-            }
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage();
-              }
-            }}
-            placeholder="Type a message..."
-            className="flex-1 p-3 rounded-lg bg-zinc-800 text-white"
-          />
+       <div className="border-t border-zinc-800 pt-4">
+  <div className="flex items-center gap-3 bg-zinc-900 rounded-2xl p-2">
 
-          <button
-            onClick={handleSendMessage}
-            className="px-4 py-2 bg-blue-600 rounded-lg"
-          >
-            Send
-          </button>
-        </div>
+    <input
+      type="text"
+      value={newMessage}
+      onChange={(e) =>
+        setNewMessage(e.target.value)
+      }
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleSendMessage();
+        }
+      }}
+      placeholder="Type a message..."
+      className="flex-1 bg-transparent outline-none px-3 py-2 text-white"
+    />
+
+    <button
+      onClick={handleSendMessage}
+      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors"
+    >
+      Send
+    </button>
+
+  </div>
+</div>
       </>
 
     )}

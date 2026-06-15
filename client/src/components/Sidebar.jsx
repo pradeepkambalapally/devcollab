@@ -3,12 +3,12 @@ import {useAuth} from "../context/AuthContext.jsx"
 import { Link } from "react-router-dom";
 import { useConversations } from "../hooks/useConversations.jsx";
 
-const Sidebar = ({setSelectedConversation, refreshSidebar}) => {
+const Sidebar = ({setSelectedConversation, refreshSidebar, selectedConversation}) => {
 const {user} = useAuth();
  const {conversations, searchTerm, setSearchTerm, searchResults, handleCreateConversation} = useConversations(refreshSidebar);
    
   return (
-    <div className="w-1/4 border-r border-zinc-800 p-4">
+    <div className="w-80 border-r border-zinc-800 p-4">
       <h2 className="text-xl font-bold text-white mb-4">
         DevCollab
       </h2>
@@ -17,13 +17,11 @@ const {user} = useAuth();
       </Link>
 
       <input
-        type="text"
-        placeholder="Search users..."
-        className="w-full p-3 rounded-lg bg-zinc-800 text-white"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-        }}
+      type="text"
+      placeholder="Search users..."
+      className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-white outline-none focus:border-blue-500"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
       />
      {
     searchResults.map((user) => (
@@ -44,9 +42,12 @@ const {user} = useAuth();
 }
 
       <div className="mt-6">
-        <h3 className="text-zinc-400 text-sm mb-3">
-          Conversations
-        </h3>
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-white">Messages</h2>
+          <p className="text-sm text-zinc-400">
+            Your recent conversations
+          </p>
+        </div>
         {
     conversations.map((conversation) => {
       
@@ -56,16 +57,39 @@ const {user} = useAuth();
           participant._id !== user._id
         );
       return(
-          <div key={conversation._id} 
-            onClick={() => {
-              console.log("Clicked:", conversation);
-              setSelectedConversation(conversation)
-            }}
-            className="p-3 rounded-lg bg-zinc-800 mb-2 cursor-pointer">
-              <h4 className="text-white font-medium"> {otherParticipant?.username}</h4>
+          <div
+  key={conversation._id}
+  onClick={() => setSelectedConversation(conversation)}
+  className={`p-3 rounded-xl mb-3 cursor-pointer transition-all
+  ${
+    selectedConversation?._id === conversation._id
+      ? "bg-blue-600"
+      : "bg-zinc-900 hover:bg-zinc-800"
+  }`}
+>
+  <div className="flex items-center gap-3">
 
-                 <p className="text-sm text-zinc-400">{conversation.lastMessage?.text || "No messages yet"}</p>
-          </div>
+    {/* Avatar */}
+    <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center font-bold">
+      {otherParticipant?.username?.charAt(0).toUpperCase()}
+    </div>
+
+    {/* Content */}
+    <div className="flex-1 min-w-0">
+
+      <h4 className="font-medium truncate">
+        {otherParticipant?.username}
+      </h4>
+
+      <p className="text-sm text-zinc-300 truncate">
+        {conversation.lastMessage?.text ||
+          "No messages yet"}
+      </p>
+
+    </div>
+
+  </div>
+</div>
       )
     })
   }
