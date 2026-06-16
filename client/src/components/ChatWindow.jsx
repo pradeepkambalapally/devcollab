@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-
+import { socket } from "../socket";
 import { useMessages } from "../hooks/useMessages";
 
 const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
@@ -17,6 +17,30 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
       behavior : "smooth"
     })
   },[messages]);
+
+  
+  useEffect(() => {
+  socket.on("connect", () => {
+    console.log(
+      "Connected:",
+      socket.id
+    );
+  });
+
+  
+
+  return () => {
+    socket.off("connect");
+  };
+}, []);
+
+
+
+useEffect(() => {
+  if (user?._id) {
+    socket.emit("join", user._id);
+  }
+}, [user]);
 
 
   return (

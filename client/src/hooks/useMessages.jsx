@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  getMessages,
-  sendMessage,
-} from "../services/messageService";
+import { getMessages, sendMessage} from "../services/messageService";
+import {socket} from "../socket";
 
-export const useMessages = (
-  selectedConversation,
-  setRefreshSidebar
-) => {
+export const useMessages = ( selectedConversation, setRefreshSidebar) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -29,6 +24,20 @@ export const useMessages = (
       fetchMessages();
     }
   }, [selectedConversation]);
+
+  useEffect(() => {
+    socket.on("newMessage", (message) => {
+      console.log("SOCKET MESSAGE", message);
+      setMessages((prev) => [
+        ...prev,
+        message
+      ])
+    })
+
+    return () =>{
+      socket.off("newMessage");
+    }
+  },[])
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;

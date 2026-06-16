@@ -1,5 +1,6 @@
 const Conversation = require('../models/Conversation');
 const Message = require("../models/Message");
+const {getIo, onlineUsers} = require('../socket')
 
 const sendMessage = async (req, res) => {
     try{
@@ -18,10 +19,36 @@ const sendMessage = async (req, res) => {
         await Conversation.findByIdAndUpdate(conversationId, 
             {lastMessage : message._id}
         )
-        res.status(201).json(message);
-    } catch (error) {
-        res.status(500).json({message: "Internal server error"});
-    }
+        
+        const conversation = await Conversation.findById(conversationId);
+
+        
+
+
+        const receiverId = conversation.participants.find((participant) => participant.toString() !== req.user._id.toString());
+        
+      
+
+        const receiverSocketId = onlineUsers[receiverId];
+
+        const io = getIo();
+
+        const populatedMessage = await Message.findById(message._id).populate("sender", "username email");
+
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit(
+                "newMessage", populatedMessage
+            )
+        }
+        res.status(201).json(populatedMessage);
+    }catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+
+    res.status(500).json({
+        message: error.message
+    });
+}
 }
 
 const getMessages = async (req, res) => {
