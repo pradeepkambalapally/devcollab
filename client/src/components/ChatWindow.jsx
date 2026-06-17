@@ -3,11 +3,14 @@ import { useAuth } from "../context/AuthContext";
 import { socket } from "../socket";
 import { useMessages } from "../hooks/useMessages";
 
+
 const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
 
-  const {messages, newMessage, setNewMessage, handleSendMessage} = useMessages(selectedConversation, setRefreshSidebar);
+  const {messages, newMessage, setNewMessage, handleSendMessage, isTyping, typingUser} = useMessages(selectedConversation, setRefreshSidebar);
   
   const messagesEndRef = useRef(null);
+  const typingTimeOutRef = useRef(null);
+  const isTypingRef = useRef(false);
   const {user} = useAuth();
 
   const otherParticipant = selectedConversation?.participants?.find((participant) => participant._id !== user._id);
@@ -21,6 +24,10 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
   
   useEffect(() => {
   socket.on("connect", () => {
+    if (user?._id) {
+    console.log("JOIN EMIT", user._id);
+    socket.emit("join", user._id);
+  }
     console.log(
       "Connected:",
       socket.id
@@ -32,15 +39,11 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
   return () => {
     socket.off("connect");
   };
-}, []);
-
-
-
-useEffect(() => {
-  if (user?._id) {
-    socket.emit("join", user._id);
-  }
 }, [user]);
+
+
+
+
 
 
   return (
@@ -116,6 +119,14 @@ useEffect(() => {
           <div ref={messagesEndRef}></div>
         </div>
 
+        {
+        isTyping && (
+        <p className="text-sm text-zinc-400 italic px-2 py-1">
+          {typingUser} is typing...
+        </p>
+      )}
+
+
         {/* Input */}
        <div className="border-t border-zinc-800 pt-4">
   <div className="flex items-center gap-3 bg-zinc-900 rounded-2xl p-2">
@@ -123,12 +134,33 @@ useEffect(() => {
     <input
       type="text"
       value={newMessage}
-      onChange={(e) =>
-        setNewMessage(e.target.value)
+      onChange={(e) => {
+        setNewMessage(e.target.value);
+       if(!isTypingRef.current){
+        console.log("Emit typing : ",{
+          receiverId : otherParticipant?._id,
+          senderName : user.username
+        })
+         socket.emit("typing", {
+          receiverId : otherParticipant?._id,
+          senderName : user.username
+        })
+        isTypingRef.current = true;
+       }
+
+        clearTimeout(typingTimeOutRef.current);
+        typingTimeOutRef.current = setTimeout(() => {
+          socket.emit("stopTyping", {
+            receiverId : otherParticipant?._id
+          })
+          isTypingRef.current = false;
+        }, 1000);
+      }
       }
       onKeyDown={(e) => {
+
         if (e.key === "Enter") {
-          handleSendMessage();
+          handleSendMessage(otherParticipant?._id);
         }
       }}
       placeholder="Type a message..."
@@ -136,7 +168,7 @@ useEffect(() => {
     />
 
     <button
-      onClick={handleSendMessage}
+      onClick={() => handleSendMessage(otherParticipant?._id)}
       className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors"
     >
       Send

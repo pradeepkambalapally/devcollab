@@ -1,11 +1,15 @@
+
 import { useAuth } from "../context/AuthContext";
+import { useOnlineUsers } from "../hooks/useOnlineUsers";
 const RightPanel = ({selectedConversation}) => {
   const {user} = useAuth();
-
+  const {onlineUsers} = useOnlineUsers();
   const otherParticipant =
   selectedConversation?.participants?.find(
     participant => participant._id !== user._id
   );
+
+  const isOnline = onlineUsers.includes(otherParticipant?._id);
  if (!selectedConversation) {
   return (
     <div className="w-80 border-l border-zinc-800 p-6">
@@ -50,9 +54,31 @@ const RightPanel = ({selectedConversation}) => {
         {otherParticipant?.username}
       </h3>
 
-      <p className="text-zinc-400 text-sm">
-        {otherParticipant?.email}
-      </p>
+      <div className="flex items-center gap-2 mt-2">
+
+  <div
+    className={`w-2 h-2 rounded-full ${
+      isOnline
+        ? "bg-green-500"
+        : "bg-zinc-500"
+    }`}
+  ></div>
+
+  <span
+    className={`text-sm ${
+      isOnline
+        ? "text-green-400"
+        : "text-zinc-500"
+    }`}
+  >
+    {isOnline ? "Online" : "Offline"}
+  </span>
+
+</div>
+
+<p className="text-zinc-400 text-sm mt-2">
+  {otherParticipant?.email}
+</p>
 
     </div>
 

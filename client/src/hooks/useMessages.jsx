@@ -5,6 +5,28 @@ import {socket} from "../socket";
 export const useMessages = ( selectedConversation, setRefreshSidebar) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState("");
+
+  useEffect(() => {
+    socket.on("typing", ({senderName}) => {
+      console.log("CLIENT GOT TYPING", senderName);
+
+      setIsTyping(true);
+      setTypingUser(senderName);
+    })
+
+    socket.on("stopTyping", () => {
+      setIsTyping(false);
+      setTypingUser("");
+    })
+
+    return () => {
+      socket.off("typing");
+      socket.off("stopTyping");
+    }
+  }, [])
+
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -27,7 +49,6 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
 
   useEffect(() => {
     socket.on("newMessage", (message) => {
-      console.log("SOCKET MESSAGE", message);
       setMessages((prev) => [
         ...prev,
         message
@@ -39,7 +60,7 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
     }
   },[])
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (receiverId) => {
     if (!newMessage.trim()) return;
 
     try {
@@ -54,6 +75,9 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
       ]);
 
       setNewMessage("");
+      socket.emit("stopTyping", {
+        receiverId
+      });
 
       setRefreshSidebar(prev => !prev);
 
@@ -67,5 +91,7 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
     newMessage,
     setNewMessage,
     handleSendMessage,
+    isTyping,
+    typingUser
   };
 };

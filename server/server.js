@@ -51,6 +51,8 @@ io.on("connection", (socket) => {
 
   socket.on("join", (userId) => {
     onlineUsers[userId] = socket.id;
+    io.emit("onlineUsers", Object.keys(onlineUsers));
+    console.log("Online users : ", Object.keys(onlineUsers));
 
     console.log(
       "User joined:",
@@ -68,11 +70,33 @@ io.on("connection", (socket) => {
       }
     }
 
+    io.emit("onlineUsers", Object.keys(onlineUsers));
+
     console.log(
       "User Disconnected:",
       socket.id
     );
   });
+
+  socket.on("typing", ({receiverId, senderName}) => {
+    
+    const receiverSocketId = onlineUsers[receiverId];
+    console.log("Receiver Socket ID:", receiverSocketId);
+    console.log("Online Users:", onlineUsers);
+    if(receiverSocketId){
+      console.log("EMITTING TYPING TO", receiverSocketId);
+      io.to(receiverSocketId).emit("typing", {
+        senderName,
+      })
+    }
+  })
+
+  socket.on("stopTyping", ({receiverId}) => {
+    const receiverSocketId = onlineUsers[receiverId];
+    if(receiverSocketId){
+      socket.to(receiverSocketId).emit("stopTyping");
+    }
+  })
 });
 
 server.listen(PORT, () => {

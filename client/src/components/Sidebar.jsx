@@ -2,10 +2,13 @@
 import {useAuth} from "../context/AuthContext.jsx"
 import { Link } from "react-router-dom";
 import { useConversations } from "../hooks/useConversations.jsx";
+import {useOnlineUsers} from "../hooks/useOnlineUsers.jsx";
 
 const Sidebar = ({setSelectedConversation, refreshSidebar, selectedConversation}) => {
 const {user} = useAuth();
  const {conversations, searchTerm, setSearchTerm, searchResults, handleCreateConversation} = useConversations(refreshSidebar);
+
+ const {onlineUsers} = useOnlineUsers();
    
   return (
     <div className="w-80 border-r border-zinc-800 p-4">
@@ -56,6 +59,8 @@ const {user} = useAuth();
         (participant) => 
           participant._id !== user._id
         );
+
+        const isOnline = onlineUsers.includes(otherParticipant._id);
       return(
           <div
   key={conversation._id}
@@ -67,28 +72,48 @@ const {user} = useAuth();
       : "bg-zinc-900 hover:bg-zinc-800"
   }`}
 >
-  <div className="flex items-center gap-3">
+  <div
+  className="flex items-center gap-4 p-4 rounded-2xl hover:bg-zinc-800 cursor-pointer"
+>
+  {/* Avatar */}
+  <div className="relative">
 
-    {/* Avatar */}
-    <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center font-bold">
+    <div className="w-12 h-12 rounded-full bg-zinc-700 flex items-center justify-center text-lg font-bold">
       {otherParticipant?.username?.charAt(0).toUpperCase()}
     </div>
 
-    {/* Content */}
-    <div className="flex-1 min-w-0">
+    {isOnline && (
+      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900"></div>
+    )}
 
-      <h4 className="font-medium truncate">
+  </div>
+
+  {/* User Info */}
+  <div className="flex-1 min-w-0">
+
+    <div className="flex items-center gap-2">
+      <h4 className="font-semibold truncate">
         {otherParticipant?.username}
       </h4>
 
-      <p className="text-sm text-zinc-300 truncate">
-        {conversation.lastMessage?.text ||
-          "No messages yet"}
-      </p>
-
+      <span
+        className={`text-xs ${
+          isOnline
+            ? "text-green-400"
+            : "text-zinc-500"
+        }`}
+      >
+        {isOnline ? "Online" : "Offline"}
+      </span>
     </div>
 
+    <p className="text-sm text-zinc-400 truncate mt-1">
+      {conversation.lastMessage?.text || "No messages yet"}
+    </p>
+
   </div>
+
+</div>
 </div>
       )
     })
