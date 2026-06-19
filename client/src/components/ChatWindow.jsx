@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef} from "react";
 import { useAuth } from "../context/AuthContext";
 import { socket } from "../socket";
 import { useMessages } from "../hooks/useMessages";
@@ -6,12 +6,14 @@ import { useMessages } from "../hooks/useMessages";
 
 const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
 
-  const {messages, newMessage, setNewMessage, handleSendMessage, isTyping, typingUser} = useMessages(selectedConversation, setRefreshSidebar);
+
+  const {messages, newMessage, setNewMessage, handleSendMessage, isTyping, typingUser, selectedImage, setSelectedImage, fileInputRef} = useMessages(selectedConversation, setRefreshSidebar);
   
   const messagesEndRef = useRef(null);
   const typingTimeOutRef = useRef(null);
   const isTypingRef = useRef(false);
   const {user} = useAuth();
+  
 
   const otherParticipant = selectedConversation?.participants?.find((participant) => participant._id !== user._id);
 
@@ -25,13 +27,8 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
   useEffect(() => {
   socket.on("connect", () => {
     if (user?._id) {
-    console.log("JOIN EMIT", user._id);
     socket.emit("join", user._id);
   }
-    console.log(
-      "Connected:",
-      socket.id
-    );
   });
 
   
@@ -85,6 +82,7 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
 
             const isMine =
               message.sender._id === user._id;
+               
 
             return (
               <div
@@ -95,23 +93,35 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
                     : "justify-start"
                 }`}
               >
-                <div
-                className={`max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                <div className={`max-w-md px-4 py-3 rounded-2xl shadow-md ${
                   isMine ? "bg-blue-600" : "bg-zinc-800"
                   }`}
-                  >
-                  <p>{message.text}</p>
-
+                >
+                  {message.attachment?.url && (
+                    <img
+                    src={message.attachment.url}
+                    alt={message.attachment.fileName}
+                    className="max-w-xs rounded-lg mb-2"
+                    />
+                  )}
+                  
+                  {message.text && (
+                    <p>{message.text}</p>
+                  )}
+                  
                   <p className="text-xs text-zinc-300 mt-1 text-right">
-                    {new Date(
-                      message.createdAt
-                    ).toLocaleTimeString([], {
+                    {new Date(message.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                       hour12: true,
-                    })}
+                  })}
                   </p>
-                </div>
+                  {isMine && message.seen && (
+                    <p className="text-xs text-blue-400 text-right">
+                      Seen
+                      </p>
+                  )}
+                  </div>
               </div>
             );
           })}
@@ -137,10 +147,7 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
       onChange={(e) => {
         setNewMessage(e.target.value);
        if(!isTypingRef.current){
-        console.log("Emit typing : ",{
-          receiverId : otherParticipant?._id,
-          senderName : user.username
-        })
+       
          socket.emit("typing", {
           receiverId : otherParticipant?._id,
           senderName : user.username
@@ -167,6 +174,27 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
       className="flex-1 bg-transparent outline-none px-3 py-2 text-white"
     />
 
+     <input
+      type="file"
+      accept="image/*"
+      ref={fileInputRef}
+      className="hidden"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setSelectedImage(file);
+        }
+      }}
+    />
+
+    {/* Attachment Button */}
+    <button
+      onClick={() => fileInputRef.current.click()}
+      className="px-3 py-2 rounded-xl hover:bg-zinc-800"
+    >
+      📎
+    </button>
+
     <button
       onClick={() => handleSendMessage(otherParticipant?._id)}
       className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors"
@@ -175,6 +203,11 @@ const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
     </button>
 
   </div>
+  {selectedImage && (
+    <p className="text-xs text-zinc-400 mt-2">
+      📷 {selectedImage.name}
+    </p>
+  )}
 </div>
       </>
 

@@ -15,8 +15,31 @@ const messageSchema = new mongoose.Schema({
 
     text : {
         type : String,
-        required : true
+        default : "",
     },
+    seen : {
+        type : Boolean,
+        default : false
+    },
+    attachment: {
+    url: {
+        type: String,
+        default: "",
+        trim : true,
+    },
+    publicId: {
+        type: String,
+        default: "",
+    },
+    fileType: {
+        type: String,
+        default: "",
+    },
+    fileName: {
+        type: String,
+        default: "",
+    },
+   },
 }, {
     timestamps : true
 })

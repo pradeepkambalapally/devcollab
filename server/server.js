@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authroutes');
 const conversationRoutes = require('./routes/conversation-routes');
 const messageRoutes = require('./routes/message-routes');
 const userRoutes = require('./routes/userroutes');
+const imageRoutes = require('./routes/imageroutes');
 const http = require('http');
 const {Server} = require("socket.io");
 connectToDB();
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/images', imageRoutes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -47,18 +49,10 @@ setIo(io);
 
 
 io.on("connection", (socket) => {
-  console.log("User Connected:", socket.id);
 
   socket.on("join", (userId) => {
     onlineUsers[userId] = socket.id;
     io.emit("onlineUsers", Object.keys(onlineUsers));
-    console.log("Online users : ", Object.keys(onlineUsers));
-
-    console.log(
-      "User joined:",
-      userId,
-      socket.id
-    );
   });
 
   socket.on("disconnect", () => {
@@ -71,20 +65,13 @@ io.on("connection", (socket) => {
     }
 
     io.emit("onlineUsers", Object.keys(onlineUsers));
-
-    console.log(
-      "User Disconnected:",
-      socket.id
-    );
   });
 
   socket.on("typing", ({receiverId, senderName}) => {
     
     const receiverSocketId = onlineUsers[receiverId];
-    console.log("Receiver Socket ID:", receiverSocketId);
-    console.log("Online Users:", onlineUsers);
+    
     if(receiverSocketId){
-      console.log("EMITTING TYPING TO", receiverSocketId);
       io.to(receiverSocketId).emit("typing", {
         senderName,
       })

@@ -4,16 +4,17 @@ const {getIo, onlineUsers} = require('../socket')
 
 const sendMessage = async (req, res) => {
     try{
-        const {conversationId, text} = req.body;
+        const {conversationId, text, attachment} = req.body;
         
-        if(!conversationId || !text){
-            return res.status(400).json({message: "conversationId and text are required"});
+        if(!conversationId || (!text && !attachment)){
+            return res.status(400).json({message: "Message must contain text or an attachment"});
         }
 
         const message = await Message.create({
             conversation : conversationId,
             sender : req.user._id,
-            text
+            text,
+            attachment
         })
 
         await Conversation.findByIdAndUpdate(conversationId, 

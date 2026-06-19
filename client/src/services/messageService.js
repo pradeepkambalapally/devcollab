@@ -17,7 +17,8 @@ export const getMessages = async (
 
 export const sendMessage = async (
   conversationId,
-  text
+  text,
+  attachment = null,
 ) => {
   const token = localStorage.getItem("token");
   const response = await api.post(
@@ -25,6 +26,7 @@ export const sendMessage = async (
     {
       conversationId,
       text,
+      attachment,
     },{
         headers : {
             Authorization : `Bearer ${token}`
