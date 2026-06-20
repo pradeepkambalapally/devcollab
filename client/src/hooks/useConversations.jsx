@@ -7,6 +7,7 @@ import {
 import {
   searchUsers,
 } from "../services/userService";
+import toast from "react-hot-toast";
 
 export const useConversations = (
   refreshSidebar
@@ -29,7 +30,8 @@ export const useConversations = (
       setConversations(data);
 
     } catch (error) {
-      console.log(error.message);
+      toast.error("Couldn't create conversation");
+      throw error
     }
   };
 

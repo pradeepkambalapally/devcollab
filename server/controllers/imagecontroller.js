@@ -20,7 +20,11 @@ const uploadImageController = async (req, res) => {
             uploadedBy : req.user._id
         })
         await newImage.save();
-        await fs.unlink(req.file.path);
+        try {
+            await fs.unlink(req.file.path);
+        } catch (err) {
+            console.error("Failed to delete temporary file:", err.message);
+        }
         res.status(200).json({
             success : true,
             message : "Image uploaded Successfully",

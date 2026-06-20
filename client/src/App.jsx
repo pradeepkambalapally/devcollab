@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import {Routes, Route} from "react-router-dom";
-import Profile from "./pages/Profile";
+import Profile from "./components/Profile/Profile";
 function App(){
 
   return (

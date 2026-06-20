@@ -3,6 +3,7 @@ import {useState} from "react";
 import api from "../api/api.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -27,12 +28,12 @@ const Login = () => {
         try{
             const response = await api.post("/auth/login", formData);   
             login(response.data.user,response.data.token);
-            // console.log(response.data)
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("user", JSON.stringify(response.data.user));
+            toast.success("Welcome back!");
             navigate("/");
         }catch(error){
-            console.error(error.response.data);
+            toast.error(error.response?.data?.message || "Login failed");
         }
     }
     return (

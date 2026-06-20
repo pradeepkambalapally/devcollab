@@ -5,6 +5,7 @@ import {socket} from "../socket";
 import { useMessageSeen } from "./useMessageSeen.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { uploadImage } from "../services/imageService.js";
+import toast from "react-hot-toast";
 
 
 export const useMessages = ( selectedConversation, setRefreshSidebar) => {
@@ -12,6 +13,7 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [typingUser, setTypingUser] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const {user} = useAuth();
@@ -49,7 +51,8 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
        
 
       } catch (error) {
-        console.log(error.message);
+        toast.error("Couldn't load messages");
+        throw error;
       }
     };
 
@@ -103,9 +106,13 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
       ]);
 
       setNewMessage("");
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setSelectedImage(null);
+      setImagePreview("");
 
-// Optional: clear the file input as well
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -118,19 +125,23 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
       
 
     } catch (error) {
-      console.log(error.message);
+      toast.error("Failed to send message.");
+      throw error
+      
     }
   };
 
   return {
-    messages,
-    newMessage,
-    setNewMessage,
-    handleSendMessage,
-    isTyping,
-    typingUser,
-    selectedImage,
-    setSelectedImage,
-    fileInputRef
+messages,
+  newMessage,
+  setNewMessage,
+  handleSendMessage,
+  isTyping,
+  typingUser,
+  selectedImage,
+  setSelectedImage,
+  imagePreview,
+  setImagePreview,
+  fileInputRef,
   };
 };

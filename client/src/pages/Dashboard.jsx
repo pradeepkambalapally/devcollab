@@ -1,6 +1,6 @@
-import Sidebar from "../components/Sidebar";
-import ChatWindow from "../components/ChatWindow";
-import RightPanel from "../components/RightPanel";
+import Sidebar from "../components/Sidebar/Sidebar";
+import ChatWindow from "../components/Chat/ChatWindow";
+import RightPanel from "../components/RightPanel/RightPanel";
 import NavigationSidebar from "../components/NavigationSidebar";
 import { useState } from "react";
 const Dashboard = () => {

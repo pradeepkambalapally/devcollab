@@ -3,26 +3,35 @@ import {
   getProfile,
   updateProfile,
 } from "../services/userService";
+import toast from "react-hot-toast";
 
 export const useProfile = () => {
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState("");
   const [github, setGithub] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       try {
-        const data = await getProfile();
-
+        const response = await getProfile();
+        const data = response.user;
         setBio(data.bio || "");
         setSkills(
           data.skills?.join(", ") || ""
         );
         setGithub(data.github || "");
         setAvatar(data.avatar || "");
+        setUsername(data.username || "");
+        setEmail(data.email || "");
       } catch (error) {
         console.log(error.message);
+      }finally{
+        setLoading(false);
       }
     };
 
@@ -30,19 +39,22 @@ export const useProfile = () => {
   }, []);
 
   const saveProfile = async () => {
+   setLoading(true);
    try{
      await updateProfile({
       bio,
       skills: skills
         .split(",")
-        .map(skill => skill.trim()),
+        .map(skill => skill.trim()).filter(Boolean),
       github,
       avatar,
     });
     return true
    }catch(error){
-    console.log(error.message);
-    return false;
+    toast.error("Couldn't load profile");
+    throw error;
+   }finally{
+    setLoading(false);
    }
   };
 
@@ -56,5 +68,8 @@ export const useProfile = () => {
     avatar,
     setAvatar,
     saveProfile,
+    loading,
+    email,
+    username
   };
 };

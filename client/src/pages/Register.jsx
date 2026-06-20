@@ -1,6 +1,7 @@
 import {useState} from "react";
 import api from "../api/api.jsx";
 import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
 const Register = () => {
     const [formData, setFormData] = useState({
         username : "",
@@ -19,9 +20,10 @@ const Register = () => {
         e.preventDefault();
         try{
             await api.post("/auth/register", formData);
+            toast.success("Account created successfully!");
             navigate("/login");
         }catch(error){
-            console.error(error.response.data);
+            toast.error(error.response?.data?.message || "Registration failed");
         }
     }
     return (
