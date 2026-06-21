@@ -2,7 +2,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import ChatWindow from "../components/Chat/ChatWindow";
 import RightPanel from "../components/RightPanel/RightPanel";
-import NavigationSidebar from "../components/NavigationSidebar";
+import NavigationSidebar from "../components/NavigationSideBar";
 
 const Dashboard = () => {
   const [selectedConversation, setSelectedConversation] = useState(null);
