@@ -41,11 +41,12 @@ const Dashboard = () => {
         className={`
           ${
             selectedConversation
-              ? "flex"
-              : "hidden md:flex"
+            ? "flex"
+            : "hidden md:flex"
           }
           flex-1
           min-w-0
+          min-h-0
           flex-col
         `}
       >
@@ -57,7 +58,7 @@ const Dashboard = () => {
       </main>
 
       {/* Right Panel */}
-      <aside className="hidden xl:flex w-80 2xl:w-96 flex-shrink-0 border-l border-zinc-800">
+      <aside className="hidden xl:flex w-80 2xl:w-96 flex-shrink-0 min-h-0">
         <RightPanel
           selectedConversation={selectedConversation}
         />

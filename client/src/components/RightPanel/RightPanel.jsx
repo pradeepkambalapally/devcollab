@@ -26,27 +26,36 @@ const RightPanel = ({
 
   return (
     <div
-      className={`h-full ${
+      className={`h-full flex flex-col bg-zinc-950 ${
         mobile
-          ? "bg-zinc-950 p-6"
-          : "w-80 border-l border-zinc-800 bg-zinc-950 p-6"
+          ? "p-6"
+          : "w-80 border-l border-zinc-800"
       }`}
     >
-      {/* Hide title on mobile because ChatWindow already shows it */}
+      {/* Desktop Header */}
       {!mobile && (
-        <h2 className="text-xl font-bold mb-6">
-          Profile
-        </h2>
+        <div className="p-6 border-b border-zinc-800">
+          <h2 className="text-xl font-bold">
+            Profile
+          </h2>
+        </div>
       )}
 
-      <ProfileHeader
-        otherParticipant={otherParticipant}
-        isOnline={isOnline}
-      />
+      {/* Scrollable Content */}
+      <div
+        className={`flex-1 min-h-0 overflow-y-auto ${
+          mobile ? "" : "p-6"
+        }`}
+      >
+        <ProfileHeader
+          otherParticipant={otherParticipant}
+          isOnline={isOnline}
+        />
 
-      <ProfileDetails
-        otherParticipant={otherParticipant}
-      />
+        <ProfileDetails
+          otherParticipant={otherParticipant}
+        />
+      </div>
     </div>
   );
 };

@@ -72,9 +72,9 @@ const ProfileDetails = ({ otherParticipant }) => {
             href={otherParticipant.github}
             target="_blank"
             rel="noreferrer"
-            className="text-blue-400 hover:text-blue-300 hover:underline break-all transition"
+            className="inline-flex items-center text-blue-400 hover:text-blue-300 hover:underline transition"
           >
-            {otherParticipant.github}
+             View GitHub Profile ↗
           </a>
         ) : (
           <p className="text-zinc-400">

@@ -34,7 +34,7 @@ const ChatWindow = ({
   const [previewImage, setPreviewImage] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
 
-  const messagesEndRef = useRef(null);
+ 
   const typingTimeOutRef = useRef(null);
   const isTypingRef = useRef(false);
   const {onlineUsers} = useOnlineUsers();
@@ -45,15 +45,23 @@ const ChatWindow = ({
     (participant) => participant._id !== user._id
   );
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
+const messageContainerRef = useRef(null);
+
+useEffect(() => {
+  const container = messageContainerRef.current;
+
+  if (container) {
+    container.scrollTo({
+      top: container.scrollHeight,
       behavior: "smooth",
     });
-  }, [messages]);
+  }
+}, [messages]);
 
   return (
     
-    <div className="flex flex-col flex-1 min-w-0 h-full bg-zinc-950">
+    <div className="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden bg-zinc-950">
+      
 
       {!selectedConversation ? (
         <WelcomeScreen />
@@ -69,7 +77,7 @@ const ChatWindow = ({
           <MessageList
             messages={messages}
             user={user}
-            messagesEndRef={messagesEndRef}
+            messageContainerRef={messageContainerRef}
             setPreviewImage={setPreviewImage}
           />
 
