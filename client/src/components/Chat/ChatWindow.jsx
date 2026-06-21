@@ -101,13 +101,14 @@ useEffect(() => {
             fileInputRef={fileInputRef}
             sending={sending}
           />
+          <ImageModal
+          previewImage={previewImage}
+          setPreviewImage={setPreviewImage}
+          />
         </>
       )}
 
-      <ImageModal
-        previewImage={previewImage}
-        setPreviewImage={setPreviewImage}
-      />
+      
 
       {/* Mobile Profile Drawer */}
 {/* Mobile Profile Screen */}
