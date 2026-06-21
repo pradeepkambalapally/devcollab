@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {sendMessage, getMessages} = require('../controllers/messagecontroller');
-const authmiddleware = require('../middleware/authMiddleware');
+const authmiddleware = require('../middleware/authmiddleware');
 const { markMessagesAsSeen } = require('../controllers/messageseencontroller');
 
 router.post('/send', authmiddleware, sendMessage);
