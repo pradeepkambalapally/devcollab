@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import {Routes, Route} from "react-router-dom";
 import Profile from "./components/Profile/Profile";
+import NotFound from "./pages/NotFound";
 function App(){
 
   return (
@@ -23,6 +24,7 @@ function App(){
     </ProtectedRoutes>
   }
 />
+<Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

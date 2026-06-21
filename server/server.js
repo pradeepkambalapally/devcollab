@@ -52,6 +52,7 @@ io.on("connection", (socket) => {
 
   socket.on("join", (userId) => {
     onlineUsers[userId] = socket.id;
+
     io.emit("onlineUsers", Object.keys(onlineUsers));
   });
 

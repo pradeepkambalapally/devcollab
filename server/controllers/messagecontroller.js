@@ -18,7 +18,10 @@ const sendMessage = async (req, res) => {
         })
 
         await Conversation.findByIdAndUpdate(conversationId, 
-            {lastMessage : message._id}
+            {
+                lastMessage : message._id,
+                updatedAt: new Date(),
+            }
         )
         
         const conversation = await Conversation.findById(conversationId);

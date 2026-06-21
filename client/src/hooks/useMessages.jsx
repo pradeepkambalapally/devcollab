@@ -15,27 +15,31 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
   const [typingUser, setTypingUser] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [sending, setSending] = useState(false);
   const fileInputRef = useRef(null);
   const {user} = useAuth();
+  const sendingRef = useRef(false);
   useMessageSeen(selectedConversation, setMessages);
 
-  useEffect(() => {
-    socket.on("typing", ({senderName}) => {
+ useEffect(() => {
+  const handleTyping = ({ senderName }) => {
+    setIsTyping(true);
+    setTypingUser(senderName);
+  };
 
-      setIsTyping(true);
-      setTypingUser(senderName);
-    })
+  const handleStopTyping = () => {
+    setIsTyping(false);
+    setTypingUser("");
+  };
 
-    socket.on("stopTyping", () => {
-      setIsTyping(false);
-      setTypingUser("");
-    })
+  socket.on("typing", handleTyping);
+  socket.on("stopTyping", handleStopTyping);
 
-    return () => {
-      socket.off("typing");
-      socket.off("stopTyping");
-    }
-  }, [])
+  return () => {
+    socket.off("typing", handleTyping);
+    socket.off("stopTyping", handleStopTyping);
+  };
+}, []);
 
 
   useEffect(() => {
@@ -48,6 +52,7 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
 
         setMessages(data);
         await markMessageAsSeen(selectedConversation._id);
+        setRefreshSidebar(prev => !prev);
        
 
       } catch (error) {
@@ -59,27 +64,41 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
     if (selectedConversation) {
       fetchMessages();
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, setRefreshSidebar]);
 
-  useEffect(() => {
-    socket.on("newMessage", async (message) => {
-       if (message.conversation !== selectedConversation?._id) {
-        return;
-       }
-       setMessages((prev) => [...prev, message]);
-       if(message.sender._id !== user._id && !message.seen){
-        await markMessageAsSeen(message.conversation);
-       }
-       
-    })
+useEffect(() => {
+  const handleNewMessage = async (message) => {
+    const conversationId =
+      typeof message.conversation === "object"
+        ? message.conversation._id
+        : message.conversation;
 
-    return () =>{
-      socket.off("newMessage");
+    if (conversationId !== selectedConversation?._id) return;
+    setMessages(prev => {
+      if (prev.some(m => m._id === message._id)) {
+        return prev;
+      }
+      return [...prev, message];
+    });
+
+    if (message.sender._id !== user._id && !message.seen) {
+      await markMessageAsSeen(conversationId);
+      setRefreshSidebar(prev => !prev);
     }
-  },[selectedConversation, user])
+  };
+
+  socket.on("newMessage", handleNewMessage);
+
+  return () => {
+    socket.off("newMessage", handleNewMessage);
+  };
+}, [selectedConversation, user, setRefreshSidebar]);
 
   const handleSendMessage = async (receiverId) => {
+    if(sendingRef.current) return;
     if (!newMessage.trim() && !selectedImage) return;
+    sendingRef.current = true;
+    setSending(true);
 
     try {
       let attachment = null;
@@ -128,11 +147,14 @@ export const useMessages = ( selectedConversation, setRefreshSidebar) => {
       toast.error("Failed to send message.");
       throw error
       
+    }finally{
+      sendingRef.current = false;
+      setSending(false);
     }
   };
 
   return {
-messages,
+  messages,
   newMessage,
   setNewMessage,
   handleSendMessage,
@@ -143,5 +165,6 @@ messages,
   imagePreview,
   setImagePreview,
   fileInputRef,
+  sending
   };
 };

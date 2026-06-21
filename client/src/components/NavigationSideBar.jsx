@@ -4,69 +4,93 @@ import {
   FiLogOut,
   FiSettings,
 } from "react-icons/fi";
-
 import { BsRobot } from "react-icons/bs";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 const NavigationSidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/login", { replace: true });
+  };
+
+  const navButton = (isActive) =>
+    `group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-200 ${
+      isActive
+        ? "bg-blue-600 shadow-lg shadow-blue-600/30 scale-105"
+        : "hover:bg-zinc-800 hover:scale-105"
+    }`;
+
   return (
-    <div className="w-20 border-r border-zinc-800 flex flex-col bg-zinc-950">
+    <aside className="w-20 bg-zinc-950 border-r border-zinc-800 flex flex-col">
 
       {/* Logo */}
-      <div className="h-20 flex items-center justify-center">
-        <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-lg text-white shadow-lg">
+      <div className="h-20 flex items-center justify-center border-b border-zinc-800">
+        <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-bold text-lg shadow-lg">
           DC
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 flex flex-col items-center gap-4">
+      <div className="flex-1 flex flex-col items-center gap-5 py-6">
 
         {/* Messages */}
         <button
           title="Messages"
-          className="p-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition-colors shadow-md"
+          onClick={() => navigate("/")}
+          className={navButton(location.pathname === "/")}
         >
-          <FiMessageSquare size={20} />
+          <FiMessageSquare size={22} />
         </button>
 
-        {/* AI Assistant */}
+        {/* AI */}
         <button
           title="AI Assistant"
-          className="p-3 rounded-xl hover:bg-zinc-800 transition-colors"
+          onClick={() => toast("🚀 AI Assistant coming soon!")}
+          className={navButton(false)}
         >
-          <BsRobot size={20} />
+          <BsRobot size={22} />
         </button>
 
         {/* Profile */}
         <button
           title="Profile"
-          className="p-3 rounded-xl hover:bg-zinc-800 transition-colors"
+          onClick={() => navigate("/profile")}
+          className={navButton(location.pathname === "/profile")}
         >
-          <FiUser size={20} />
+          <FiUser size={22} />
         </button>
+
       </div>
 
-      {/* Bottom Actions */}
-      <div className="flex flex-col items-center gap-4 pb-6 border-t border-zinc-800 pt-4">
+      {/* Bottom */}
+      <div className="border-t border-zinc-800 py-5 flex flex-col items-center gap-4">
 
-        {/* Settings */}
         <button
           title="Settings"
-          className="p-3 rounded-xl hover:bg-zinc-800 transition-colors"
+          onClick={() => toast("⚙️ Settings coming soon!")}
+          className={navButton(false)}
         >
-          <FiSettings size={20} />
+          <FiSettings size={21} />
         </button>
 
-        {/* Logout */}
         <button
           title="Logout"
-          className="p-3 rounded-xl hover:bg-red-900 transition-colors"
+          onClick={handleLogout}
+          className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 hover:bg-red-600 hover:scale-105"
         >
-          <FiLogOut size={20} />
+          <FiLogOut size={21} />
         </button>
 
       </div>
-    </div>
+
+    </aside>
   );
 };
 

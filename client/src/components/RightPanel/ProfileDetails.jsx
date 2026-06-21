@@ -1,82 +1,86 @@
 const ProfileDetails = ({ otherParticipant }) => {
   return (
-    <div className="mt-8 space-y-4">
+    <div className="mt-8 space-y-5">
 
-      <div>
-        <p className="text-zinc-500 text-sm">
+      {/* Username */}
+      <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <p className="text-xs uppercase tracking-wide text-zinc-500 mb-2">
           Username
         </p>
 
-        <p>{otherParticipant?.username}</p>
+        <p className="font-medium">
+          {otherParticipant?.username}
+        </p>
       </div>
 
-      <div>
-        <p className="text-zinc-500 text-sm">
+      {/* Email */}
+      <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <p className="text-xs uppercase tracking-wide text-zinc-500 mb-2">
           Email
         </p>
 
-        <p>{otherParticipant?.email}</p>
+        <p className="break-all">
+          {otherParticipant?.email}
+        </p>
       </div>
 
-      <div className="bg-zinc-900 p-4 rounded-xl">
-        <p className="text-zinc-500 text-sm mb-2">
+      {/* Bio */}
+      <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <p className="text-xs uppercase tracking-wide text-zinc-500 mb-2">
           Bio
         </p>
 
-        <p>{otherParticipant?.bio || "NA"}</p>
+        <p className="text-zinc-300 leading-relaxed">
+          {otherParticipant?.bio || "No bio added yet."}
+        </p>
       </div>
 
-      <div className="bg-zinc-900 p-4 rounded-xl">
-        <p className="text-zinc-500 text-sm mb-3">
+      {/* Skills */}
+      <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <p className="text-xs uppercase tracking-wide text-zinc-500 mb-3">
           Skills
         </p>
 
         <div className="flex flex-wrap gap-2">
 
           {otherParticipant?.skills?.length ? (
-
             otherParticipant.skills.map((skill, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-zinc-800 rounded-full text-sm"
+                className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 border border-blue-600/30 text-sm"
               >
                 {skill}
               </span>
             ))
-
           ) : (
-
-            <p>NA</p>
-
+            <p className="text-zinc-400">
+              No skills added.
+            </p>
           )}
 
         </div>
-
       </div>
 
-      <div className="bg-zinc-900 p-4 rounded-xl">
-
-        <p className="text-zinc-500 text-sm mb-2">
+      {/* GitHub */}
+      <div className="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+        <p className="text-xs uppercase tracking-wide text-zinc-500 mb-2">
           GitHub
         </p>
 
         {otherParticipant?.github ? (
-
           <a
             href={otherParticipant.github}
             target="_blank"
             rel="noreferrer"
-            className="text-blue-400 hover:underline break-all"
+            className="text-blue-400 hover:text-blue-300 hover:underline break-all transition"
           >
-            View Profile
+            {otherParticipant.github}
           </a>
-
         ) : (
-
-          <p>NA</p>
-
+          <p className="text-zinc-400">
+            GitHub profile not added.
+          </p>
         )}
-
       </div>
 
     </div>

@@ -1,6 +1,6 @@
 const TypingIndicator = ({ typingUser }) => {
   return (
-    <p className="text-sm text-zinc-400 italic px-2 py-1">
+    <p className="text-xs md:text-sm text-zinc-400 px-4 md:px-6 pb-2">
       {typingUser} is typing...
     </p>
   );

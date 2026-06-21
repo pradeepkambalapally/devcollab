@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
     const {username, email, password} = req.body;
+    
     try{
         const existingUser = await User.findOne({username});
         if(existingUser){
@@ -13,6 +14,17 @@ const register = async (req, res) => {
                 success : false,
                 message : "Username already exists"
             })
+        }
+        if (!password || password.length < 6) {
+            return res.status(400).json({
+                message: "Password must be at least 6 characters long.",
+            });
+        }
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({
+                message: "Email already exists",
+            });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)

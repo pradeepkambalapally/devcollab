@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { socket } from "../../socket";
 import { useMessages } from "../../hooks/useMessages";
@@ -8,98 +8,132 @@ import MessageInput from "./MessageInput";
 import ChatHeader from "./ChatHeader";
 import WelcomeScreen from "./WelcomeScreen";
 import TypingIndicator from "./TypingIndicator";
+import { useOnlineUsers } from "../../hooks/useOnlineUsers";
+import RightPanel from "../RightPanel/RightPanel";
 
+const ChatWindow = ({
+  selectedConversation,
+  setSelectedConversation,
+  setRefreshSidebar,
+}) => {
+  const {
+    messages,
+    newMessage,
+    setNewMessage,
+    handleSendMessage,
+    isTyping,
+    typingUser,
+    selectedImage,
+    setSelectedImage,
+    fileInputRef,
+    imagePreview,
+    setImagePreview,
+    sending,
+  } = useMessages(selectedConversation, setRefreshSidebar);
 
-const ChatWindow = ({selectedConversation, setRefreshSidebar }) => {
-
-
-  const {messages, newMessage, setNewMessage, handleSendMessage, 
-    isTyping, typingUser, selectedImage, setSelectedImage, fileInputRef, imagePreview, setImagePreview} = useMessages(selectedConversation, setRefreshSidebar);
   const [previewImage, setPreviewImage] = useState(null);
-  
+  const [showProfile, setShowProfile] = useState(false);
+
   const messagesEndRef = useRef(null);
   const typingTimeOutRef = useRef(null);
   const isTypingRef = useRef(false);
-  const {user} = useAuth();
-  
+  const {onlineUsers} = useOnlineUsers();
 
-  const otherParticipant = selectedConversation?.participants?.find((participant) => participant._id !== user._id);
+  const { user } = useAuth();
+
+  const otherParticipant = selectedConversation?.participants?.find(
+    (participant) => participant._id !== user._id
+  );
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
-      behavior : "smooth"
-    })
-  },[messages]);
-
-  
-  useEffect(() => {
-  if (user?._id) {
-    socket.emit("join", user._id);
-  }
-}, [user]);
-
-
-
-
-
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   return (
-  <div className="flex-1 flex flex-col p-4 text-white">
+    
+    <div className="flex flex-col flex-1 min-w-0 h-full bg-zinc-950">
 
-    {!selectedConversation ? (
-      <WelcomeScreen />
-    ) : (
+      {!selectedConversation ? (
+        <WelcomeScreen />
+      ) : (
+        <>
+          <ChatHeader
+            otherParticipant={otherParticipant}
+            setSelectedConversation={setSelectedConversation}
+            onlineUsers={onlineUsers}
+            onProfileClick={() => setShowProfile(true)}
+          />
 
-      <>
-        {/* Header */}
-        <ChatHeader
-    otherParticipant={otherParticipant}
-/>
+          <MessageList
+            messages={messages}
+            user={user}
+            messagesEndRef={messagesEndRef}
+            setPreviewImage={setPreviewImage}
+          />
 
-        {/* Messages */}
-       <MessageList
-    messages={messages}
-    user={user}
-    messagesEndRef={messagesEndRef}
-    setPreviewImage={setPreviewImage}
-/>
+          {isTyping && (
+            <TypingIndicator typingUser={typingUser} />
+          )}
 
-      {
-        isTyping && (
-        <TypingIndicator
-        typingUser={typingUser}
-        />
-        )
-      }
+          <MessageInput
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            handleSendMessage={handleSendMessage}
+            otherParticipant={otherParticipant}
+            socket={socket}
+            user={user}
+            isTypingRef={isTypingRef}
+            typingTimeOutRef={typingTimeOutRef}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            imagePreview={imagePreview}
+            setImagePreview={setImagePreview}
+            fileInputRef={fileInputRef}
+            sending={sending}
+          />
+        </>
+      )}
 
+      <ImageModal
+        previewImage={previewImage}
+        setPreviewImage={setPreviewImage}
+      />
 
-<MessageInput
-    newMessage={newMessage}
-    setNewMessage={setNewMessage}
-    handleSendMessage={handleSendMessage}
-    otherParticipant={otherParticipant}
-    socket={socket}
-    user={user}
-    isTypingRef={isTypingRef}
-    typingTimeOutRef={typingTimeOutRef}
-    selectedImage={selectedImage}
-    setSelectedImage={setSelectedImage}
-    imagePreview={imagePreview}
-    setImagePreview={setImagePreview}
-    fileInputRef={fileInputRef}
-/>
+      {/* Mobile Profile Drawer */}
+{/* Mobile Profile Screen */}
+{showProfile && (
+  <div className="fixed inset-0 z-50 bg-zinc-950 xl:hidden">
 
-      </>
+    {/* Header */}
+    <div className="flex items-center gap-4 p-4 border-b border-zinc-800">
 
-    )}
+      <button
+        onClick={() => setShowProfile(false)}
+        className="text-2xl hover:text-blue-400 transition"
+      >
+        ←
+      </button>
 
-    <ImageModal
-  previewImage={previewImage}
-  setPreviewImage={setPreviewImage}
-/>
+      <h2 className="text-lg font-semibold">
+        Profile
+      </h2>
+
+    </div>
+
+    {/* Content */}
+    <div className="h-[calc(100vh-73px)] overflow-y-auto">
+      <RightPanel
+        selectedConversation={selectedConversation}
+        mobile={true}
+      />
+    </div>
 
   </div>
-);
+)}
+    </div>
+  );
 };
 
 export default ChatWindow;

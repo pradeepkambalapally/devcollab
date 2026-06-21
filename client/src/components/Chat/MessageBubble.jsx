@@ -1,34 +1,46 @@
-const MessageBubble = ({ message, isMine, setPreviewImage }) => {
+const MessageBubble = ({
+  message,
+  isMine,
+  setPreviewImage,
+}) => {
   return (
     <div
-      className={`flex mb-3 ${
+      className={`flex mb-4 ${
         isMine ? "justify-end" : "justify-start"
-      }`}
+      } animate-fadeIn`}
     >
       <div
-        className={`max-w-md rounded-2xl shadow-md ${
-          isMine ? "bg-blue-600" : "bg-zinc-800"
+        className={`max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] rounded-2xl shadow-lg ${
+          isMine
+            ? "bg-blue-600 text-white rounded-br-md"
+            : "bg-zinc-800 text-white rounded-bl-md"
         } ${
-          message.attachment?.url ? "p-1.5" : "px-4 py-3"
-        }`}
+          message.attachment?.url ? "p-2" : "px-4 py-3"
+        } transition-all duration-200`}
       >
         {message.attachment?.url && (
           <img
             src={message.attachment.url}
             alt={message.attachment.fileName}
-            onClick={() => setPreviewImage(message.attachment.url)}
-            className="max-w-[280px] max-h-[320px] rounded-xl object-cover cursor-pointer hover:opacity-90 transition"
+            onClick={() =>
+              setPreviewImage(message.attachment.url)
+            }
+            className="w-full max-w-xs sm:max-w-sm rounded-xl object-cover cursor-pointer hover:scale-[1.02] transition-transform duration-200"
           />
         )}
 
         {message.text && (
-          <p className={message.attachment?.url ? "mt-2" : ""}>
+          <p
+            className={`break-words whitespace-pre-wrap leading-relaxed ${
+              message.attachment?.url ? "mt-3" : ""
+            }`}
+          >
             {message.text}
           </p>
         )}
 
-        <div className="flex items-center justify-end gap-2 mt-2">
-          <span className="text-xs text-zinc-300">
+        <div className="flex justify-end items-center gap-2 mt-2">
+          <span className="text-[11px] text-zinc-300">
             {new Date(message.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -36,9 +48,15 @@ const MessageBubble = ({ message, isMine, setPreviewImage }) => {
             })}
           </span>
 
-          {isMine && message.seen && (
-            <span className="text-xs text-blue-300">
-              Seen
+          {isMine && (
+            <span
+              className={`text-xs ${
+                message.seen
+                  ? "text-sky-300"
+                  : "text-zinc-300"
+              }`}
+            >
+              {message.seen ? "✓✓" : "✓"}
             </span>
           )}
         </div>

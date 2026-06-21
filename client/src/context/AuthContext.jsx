@@ -1,5 +1,6 @@
-    import {createContext, useState, useContext} from "react";
-
+import { useEffect } from "react";
+import {createContext, useState, useContext} from "react";
+import {socket} from "../socket"
 
     const AuthContext = createContext();
 
@@ -21,12 +22,35 @@
          localStorage.setItem("token", token);
         };
         const logout = () => {
+        console.log("Logging out...");
         setUser(null);
         setToken(null);
 
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-    };
+        };
+
+        useEffect(() => {
+  if (!user?._id) {
+    if (socket.connected) {
+      socket.disconnect();
+    }
+    return;
+  }
+
+  if (!socket.connected) {
+    socket.connect();
+  }
+
+  socket.emit("join", user._id);
+
+  return () => {
+    socket.off("typing");
+    socket.off("stopTyping");
+    socket.off("newMessage");
+    socket.off("messageSeen");
+  };
+}, [user]);
 
         return (
             <AuthContext.Provider 

@@ -1,40 +1,54 @@
-
 import { useAuth } from "../../context/AuthContext";
 import { useOnlineUsers } from "../../hooks/useOnlineUsers";
-import ProfileHeader from "./EmptyProfile";
+import ProfileHeader from "./ProfileHeader";
 import ProfileDetails from "./ProfileDetails";
-import EmptyProfile  from "./EmptyProfile";
-const RightPanel = ({selectedConversation}) => {
-  const {user} = useAuth();
-  const {onlineUsers} = useOnlineUsers();
+import EmptyProfile from "./EmptyProfile";
+
+const RightPanel = ({
+  selectedConversation,
+  mobile = false,
+}) => {
+  const { user } = useAuth();
+  const { onlineUsers } = useOnlineUsers();
+
   const otherParticipant =
-  selectedConversation?.participants?.find(
-    participant => participant._id !== user._id
+    selectedConversation?.participants?.find(
+      (participant) => participant._id !== user._id
+    );
+
+  const isOnline = onlineUsers.includes(
+    otherParticipant?._id
   );
 
-  const isOnline = onlineUsers.includes(otherParticipant?._id);
-if (!selectedConversation) {
+  if (!selectedConversation) {
     return <EmptyProfile />;
   }
 
-    return (
-        <div className="w-80 border-l border-zinc-800 p-6">
+  return (
+    <div
+      className={`h-full ${
+        mobile
+          ? "bg-zinc-950 p-6"
+          : "w-80 border-l border-zinc-800 bg-zinc-950 p-6"
+      }`}
+    >
+      {/* Hide title on mobile because ChatWindow already shows it */}
+      {!mobile && (
+        <h2 className="text-xl font-bold mb-6">
+          Profile
+        </h2>
+      )}
 
-            <h2 className="text-xl font-bold mb-6">
-                Profile
-            </h2>
+      <ProfileHeader
+        otherParticipant={otherParticipant}
+        isOnline={isOnline}
+      />
 
-            <ProfileHeader
-                otherParticipant={otherParticipant}
-                isOnline={isOnline}
-            />
-
-            <ProfileDetails
-                otherParticipant={otherParticipant}
-            />
-
-        </div>
-    );
+      <ProfileDetails
+        otherParticipant={otherParticipant}
+      />
+    </div>
+  );
 };
 
 export default RightPanel;

@@ -1,5 +1,5 @@
 
-const {uploadImage} = require('../helper/cloudinayhelper')
+const {uploadImage} = require('../helper/cloudinayHelper')
 const Image = require('../models/Image');
 const fs = require("fs/promises");
 

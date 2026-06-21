@@ -3,13 +3,19 @@ import toast from "react-hot-toast";
 
 export const uploadImage = async (image) => {
   try {
+
+    const token = localStorage.getItem("token");
     const formData = new FormData();
 
     formData.append("image", image);
 
     const response = await api.post(
       "/images/upload",
-      formData
+      formData,{
+        headers : {
+          Authorization : `Bearer ${token}`
+        }
+      }
     );
 
     return response.data;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import {socket} from "../socket";
 import {
   getConversations,
   createConversation,
@@ -39,6 +40,16 @@ export const useConversations = (
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchConversations();
   }, [refreshSidebar]);
+
+  useEffect(() => {
+  socket.on("newMessage", () => {
+    fetchConversations();
+  });
+
+  return () => {
+    socket.off("newMessage");
+  };
+}, []);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
