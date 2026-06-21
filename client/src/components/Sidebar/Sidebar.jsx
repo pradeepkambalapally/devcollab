@@ -19,7 +19,7 @@ const Sidebar = ({
     setSearchTerm,
     searchResults,
     handleCreateConversation,
-  } = useConversations(refreshSidebar);
+  } = useConversations(refreshSidebar, setSelectedConversation);
 
   const { onlineUsers } = useOnlineUsers();
 

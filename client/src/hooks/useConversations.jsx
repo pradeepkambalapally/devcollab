@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {socket} from "../socket";
 import {
   getConversations,
@@ -11,7 +11,8 @@ import {
 import toast from "react-hot-toast";
 
 export const useConversations = (
-  refreshSidebar
+  refreshSidebar,
+  setSelectedConversation
 ) => {
 
   const [conversations, setConversations] =
@@ -23,33 +24,35 @@ export const useConversations = (
   const [searchResults, setSearchResults] =
     useState([]);
 
-  const fetchConversations = async () => {
-    try {
-      const data =
-        await getConversations();
+const fetchConversations = useCallback(async () => {
+  try {
+    const data = await getConversations();
 
-      setConversations(data);
+    setConversations(data);
 
-    } catch (error) {
-      toast.error("Couldn't create conversation");
-      throw error
-    }
+    return data;
+  } catch (error) {
+    toast.error("Couldn't load conversations");
+    throw error;
+  }
+}, []);
+
+useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  fetchConversations();
+}, [fetchConversations, refreshSidebar]);
+
+useEffect(() => {
+  const handleNewMessage = () => {
+    fetchConversations();
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchConversations();
-  }, [refreshSidebar]);
-
-  useEffect(() => {
-  socket.on("newMessage", () => {
-    fetchConversations();
-  });
+  socket.on("newMessage", handleNewMessage);
 
   return () => {
-    socket.off("newMessage");
+    socket.off("newMessage", handleNewMessage);
   };
-}, []);
+}, [fetchConversations]);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -71,24 +74,27 @@ export const useConversations = (
       setSearchResults([]);
     }
   }, [searchTerm]);
+const handleCreateConversation = async (receiverId) => {
+  try {
+    const createdConversation = await createConversation(receiverId);
 
-  const handleCreateConversation =
-    async (receiverId) => {
-      try {
+    const updatedConversations = await fetchConversations();
 
-        await createConversation(
-          receiverId
-        );
+    const selected = updatedConversations.find(
+      (conversation) => conversation._id === createdConversation._id
+    );
 
-        fetchConversations();
+    if (selected) {
+      setSelectedConversation(selected);
+    }
 
-        setSearchTerm("");
-        setSearchResults([]);
-
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
+    setSearchTerm("");
+    setSearchResults([]);
+  } catch (error) {
+    console.log(error.message);
+    toast.error("Couldn't create conversation");
+  }
+};
 
   return {
     conversations,

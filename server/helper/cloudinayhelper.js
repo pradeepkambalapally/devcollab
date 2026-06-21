@@ -9,9 +9,7 @@ const uploadImage = async (filePath) => {
             public_id: result.public_id,
         };
     } catch (err) {
-        return res.status(500).json({
-            message : err.message
-        })
+       throw err;
     }
 };
 module.exports = {
