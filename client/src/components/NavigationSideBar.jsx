@@ -17,7 +17,7 @@ const NavigationSidebar = () => {
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const navButton = (isActive) =>

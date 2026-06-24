@@ -22,7 +22,6 @@ import {socket} from "../socket"
          localStorage.setItem("token", token);
         };
         const logout = () => {
-        console.log("Logging out...");
         setUser(null);
         setToken(null);
 
